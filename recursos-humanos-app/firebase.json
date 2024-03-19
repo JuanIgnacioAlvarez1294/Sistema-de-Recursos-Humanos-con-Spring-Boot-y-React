@@ -1,0 +1,16 @@
+{
+  "hosting": {
+    "public": "build",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/rh-app/**",
+        "destination": "https://sistema-de-recursos-humanos.web.app/rh-app/$1"
+      }
+    ]
+  }
+}
