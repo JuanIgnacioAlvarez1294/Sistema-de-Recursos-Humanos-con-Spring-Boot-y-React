@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import axios from "axios";
 
 export default function EditarEmpleado() {
@@ -11,6 +11,8 @@ export default function EditarEmpleado() {
     departamento: "",
     sueldo: "",
   });
+
+  const { nombre, departamento, sueldo } = empleado;
 
   useEffect(() => {
     cargarEmpleado();
@@ -27,85 +29,102 @@ export default function EditarEmpleado() {
   };
 
   const onInputChange = (e) => {
-    //Spread operator ...(expandir los atributos)
     setEmpleado({ ...empleado, [e.target.name]: e.target.value });
   };
 
   const onSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      // Convertir sueldo a número
-      empleado.sueldo = parseFloat(empleado.sueldo);
+      // Convertimos a número antes de enviar
+      const empleadoAEnviar = {
+        ...empleado,
+        sueldo: parseFloat(sueldo)
+      };
 
-      // Enviar datos al backend usando Axios
-      await axios.put(`http://localhost:8080/rh-app/empleados/${id}`, empleado);
-
-      // Redirigir a la página de inicio
+      await axios.put(`http://localhost:8080/rh-app/empleados/${id}`, empleadoAEnviar);
       navegacion('/');
     } catch (error) {
       console.error("Error al editar empleado", error);
     }
   };
 
-  const { nombre, departamento, sueldo } = empleado; // Desestructura los campos del objeto empleado
-
   return (
-    <div className="container">
-      <div className="container text-center" style={{ margin: "30px" }}>
-        <h3>Editar Empleado</h3>
+    <div className="row justify-content-center">
+      <div className="col-md-6">
+        <div className="card shadow-lg border-0 rounded-4">
+          {/* Header con color de advertencia suave para indicar edición */}
+          <div className="card-header text-white text-center py-4" style={{ backgroundColor: "#f59e0b", borderRadius: "12px 12px 0 0" }}>
+            <h4 className="mb-0 fw-bold">Actualizar Información</h4>
+            <p className="small mb-0 opacity-75">Modificando los datos del empleado ID: {id}</p>
+          </div>
+          
+          <div className="card-body p-5 bg-white">
+            <form onSubmit={(e) => onSubmit(e)}>
+              {/* Campo Nombre */}
+              <div className="mb-4">
+                <label htmlFor="nombre" className="form-label fw-bold text-muted small text-uppercase">
+                  Nombre Completo
+                </label>
+                <input
+                  type="text"
+                  className="form-control form-control-lg bg-light border-0"
+                  id="nombre"
+                  name="nombre"
+                  required
+                  value={nombre}
+                  onChange={(e) => onInputChange(e)}
+                />
+              </div>
+
+              {/* Campo Departamento */}
+              <div className="mb-4">
+                <label htmlFor="departamento" className="form-label fw-bold text-muted small text-uppercase">
+                  Departamento / Área
+                </label>
+                <input
+                  type="text"
+                  className="form-control form-control-lg bg-light border-0"
+                  id="departamento"
+                  name="departamento"
+                  required
+                  value={departamento}
+                  onChange={(e) => onInputChange(e)}
+                />
+              </div>
+
+              {/* Campo Sueldo */}
+              <div className="mb-5">
+                <label htmlFor="sueldo" className="form-label fw-bold text-muted small text-uppercase">
+                  Sueldo Bruto
+                </label>
+                <div className="input-group">
+                  <span className="input-group-text bg-light border-0 text-muted">$</span>
+                  <input
+                    type="number"
+                    step="any"
+                    className="form-control form-control-lg bg-light border-0"
+                    id="sueldo"
+                    name="sueldo"
+                    required
+                    value={sueldo}
+                    onChange={(e) => onInputChange(e)}
+                  />
+                </div>
+              </div>
+
+              {/* Botones */}
+              <div className="d-grid gap-2">
+                <button type="submit" className="btn btn-lg fw-bold shadow-sm text-white" style={{ backgroundColor: "#f59e0b", border: "none" }}>
+                  Guardar Cambios
+                </button>
+                <Link to="/" className="btn btn-link text-muted text-decoration-none mt-2">
+                  Cancelar
+                </Link>
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
-      <form onSubmit={(e) => onSubmit(e)}>
-        <div className="mb-3">
-          <label htmlFor="nombre" className="form-label">
-            Nombre
-          </label>
-          <input
-            type="text"
-            className="form-control"
-            id="nombre"
-            name="nombre"
-            required={true}
-            value={nombre}
-            onChange={(e) => onInputChange(e)}
-          />
-        </div>
-        <div className="mb-3">
-          <label htmlFor="departamento" className="form-label">
-            Departamento
-          </label>
-          <input
-            type="text"
-            className="form-control"
-            id="departamento"
-            name="departamento"
-            value={departamento}
-            onChange={(e) => onInputChange(e)}
-          />
-        </div>
-        <div className="mb-3">
-          <label htmlFor="sueldo" className="form-label">
-            Sueldo
-          </label>
-          <input
-            type="number"
-            step="any"
-            className="form-control"
-            id="sueldo"
-            name="sueldo"
-            value={sueldo}
-            onChange={(e) => onInputChange(e)}
-          />
-        </div>
-        <div className="text-center">
-          <button type="submit" className="btn btn-warning btn-sm me-3">
-            Guardar
-          </button>
-          <a href="/" className="btn btn-danger btn-sm">
-            Regresar
-          </a>
-        </div>
-      </form>
     </div>
   );
 }
